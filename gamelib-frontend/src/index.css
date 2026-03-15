@@ -1,0 +1,20 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    background-color: theme("colors.dark");
+    color: theme("colors.white");
+  }
+}
+
+@layer components {
+  /* Common glow effects for hover / active elements */
+  .glow-hover {
+    @apply transition-all duration-300;
+  }
+  .glow-hover:hover {
+    box-shadow: 0 0 15px theme("colors.glow");
+  }
+}

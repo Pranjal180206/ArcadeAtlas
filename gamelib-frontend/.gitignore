@@ -1,0 +1,5 @@
+# Frontend specific ignores
+.env
+node_modules/
+dist/
+build/

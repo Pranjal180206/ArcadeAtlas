@@ -1,0 +1,6 @@
+# Backend specific ignores
+.env
+__pycache__/
+venv/
+*.pyc
+db_data/
