@@ -1,11 +1,11 @@
 from database import db
 from datetime import datetime, timezone
+from bson import ObjectId
 
 async def get_user_by_email(email: str):
     return await db.users.find_one({"email": email.lower().strip()})
 
 async def get_user_by_id(user_id: str):
-    from bson import ObjectId
     return await db.users.find_one({"_id": ObjectId(user_id)})
 
 async def create_user(user_data: dict):
@@ -16,7 +16,7 @@ async def create_user(user_data: dict):
 
 async def get_user_stats(user_id: str):
     pipeline = [
-        {"$match": {"user_id": user_id}},
+        {"$match": {"user_id": ObjectId(user_id)}},
         {
             "$facet": {
                 "total": [{"$count": "count"}],

@@ -14,6 +14,7 @@ export default function GameForm({ initialData = null, onSubmit, isLoading, butt
         status: initialData?.status || 'Backlog',
         sessions: initialData?.sessions || []
     });
+    const [fieldErrors, setFieldErrors] = useState({});
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -49,8 +50,25 @@ export default function GameForm({ initialData = null, onSubmit, isLoading, butt
         });
     };
 
+    const validate = () => {
+        const errors = {};
+        if (!formData.title.trim()) errors.title = 'Title is required';
+        if (formData.completion_count < 0) errors.completion_count = 'Completion count cannot be negative';
+        
+        const sessionErrors = {};
+        formData.sessions.forEach((s, idx) => {
+            if (s.hours_played < 0) sessionErrors[idx] = 'Hours cannot be negative';
+            else if (new Date(s.end_date) < new Date(s.start_date)) sessionErrors[idx] = 'End date cannot be before start date';
+        });
+        if (Object.keys(sessionErrors).length > 0) errors.sessions = sessionErrors;
+        
+        setFieldErrors(errors);
+        return Object.keys(errors).length === 0;
+    };
+
     const handleSubmit = (e) => {
         e.preventDefault();
+        if (!validate()) return;
         onSubmit(formData);
     };
 
@@ -76,10 +94,11 @@ export default function GameForm({ initialData = null, onSubmit, isLoading, butt
                                 type="text"
                                 value={formData.title}
                                 onChange={handleChange}
-                                className="w-full bg-dark border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all placeholder:text-zinc-600"
+                                className={`w-full bg-dark border ${fieldErrors.title ? 'border-red-500' : 'border-white/10'} rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all placeholder:text-zinc-600`}
                                 placeholder="e.g. Elden Ring"
                                 required
                             />
+                            {fieldErrors.title && <p className="mt-1 text-xs text-red-500">{fieldErrors.title}</p>}
                         </div>
 
                         <div className="sm:col-span-2">
@@ -134,8 +153,9 @@ export default function GameForm({ initialData = null, onSubmit, isLoading, butt
                                 min="0"
                                 value={formData.completion_count}
                                 onChange={handleChange}
-                                className="w-full bg-dark border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all"
+                                className={`w-full bg-dark border ${fieldErrors.completion_count ? 'border-red-500' : 'border-white/10'} rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all`}
                             />
+                            {fieldErrors.completion_count && <p className="mt-1 text-xs text-red-500">{fieldErrors.completion_count}</p>}
                         </div>
                     </div>
 
@@ -202,6 +222,9 @@ export default function GameForm({ initialData = null, onSubmit, isLoading, butt
                                                 </button>
                                             </div>
                                         </div>
+                                        {fieldErrors.sessions && fieldErrors.sessions[index] && (
+                                            <p className="mt-2 text-xs text-red-500 col-span-1 sm:col-span-3">{fieldErrors.sessions[index]}</p>
+                                        )}
                                     </div>
                                 ))}
                             </div>

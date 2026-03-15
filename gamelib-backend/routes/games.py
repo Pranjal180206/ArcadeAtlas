@@ -15,7 +15,7 @@ router = APIRouter(prefix="/games", tags=["games"])
 @router.post("/", response_model=GameInDB, status_code=status.HTTP_201_CREATED)
 async def create_game(game: GameCreate, current_user: UserInDB = Depends(get_current_user)):
     game_dict = game.model_dump()
-    game_dict["user_id"] = current_user.id
+    game_dict["user_id"] = ObjectId(current_user.id)
     game_dict["created_at"] = datetime.now(timezone.utc)
     
     if isinstance(game_dict.get("status"), Enum):

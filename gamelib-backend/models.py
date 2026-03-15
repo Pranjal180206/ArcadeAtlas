@@ -40,7 +40,7 @@ class PlaySession(BaseModel):
 class GameBase(BaseModel):
     title: str
     cover_url: str
-    platform: str = "PC"
+    platform: Optional[str] = None
     status: GameStatus
     completion_count: int = 0
     sessions: List[PlaySession] = []
@@ -54,6 +54,7 @@ class GameUpdate(BaseModel):
     status: Optional[GameStatus] = None
     completion_count: Optional[int] = None
     sessions: Optional[List[PlaySession]] = None
+    platform: Optional[str] = None
 
 class GameInDB(GameBase):
     id: str = Field(alias="_id")
