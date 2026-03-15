@@ -8,6 +8,7 @@ export default function Register() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [fieldErrors, setFieldErrors] = useState({});
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const { register, login, googleLogin, user } = useAuth();
@@ -15,13 +16,24 @@ export default function Register() {
 
     if (user) return <Navigate to="/dashboard" replace />;
 
+    const validate = () => {
+        const errors = {};
+        if (!email) errors.email = 'Email is required';
+        else if (!/\S+@\S+\.\S+/.test(email)) errors.email = 'Email is invalid';
+        
+        if (!password) errors.password = 'Password is required';
+        else if (password.length < 6) errors.password = 'Password must be at least 6 characters';
+        
+        if (password !== confirmPassword) errors.confirmPassword = 'Passwords do not match';
+        
+        setFieldErrors(errors);
+        return Object.keys(errors).length === 0;
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
-
-        if (password !== confirmPassword) {
-            return setError('Passwords do not match');
-        }
+        if (!validate()) return;
 
         setIsLoading(true);
         try {
@@ -61,10 +73,11 @@ export default function Register() {
                             type="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            className="w-full bg-dark border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all placeholder:text-zinc-600"
+                            className={`w-full bg-dark border ${fieldErrors.email ? 'border-red-500' : 'border-white/10'} rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all placeholder:text-zinc-600`}
                             placeholder="gamer@example.com"
                             required
                         />
+                        {fieldErrors.email && <p className="mt-1 text-xs text-red-500">{fieldErrors.email}</p>}
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-zinc-300 mb-1.5" htmlFor="password">Password</label>
@@ -73,11 +86,11 @@ export default function Register() {
                             type="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            className="w-full bg-dark border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all placeholder:text-zinc-600"
+                            className={`w-full bg-dark border ${fieldErrors.password ? 'border-red-500' : 'border-white/10'} rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all placeholder:text-zinc-600`}
                             placeholder="••••••••"
                             required
-                            minLength={6}
                         />
+                        {fieldErrors.password && <p className="mt-1 text-xs text-red-500">{fieldErrors.password}</p>}
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-zinc-300 mb-1.5" htmlFor="confirmPassword">Confirm Password</label>
@@ -86,11 +99,11 @@ export default function Register() {
                             type="password"
                             value={confirmPassword}
                             onChange={(e) => setConfirmPassword(e.target.value)}
-                            className="w-full bg-dark border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all placeholder:text-zinc-600"
+                            className={`w-full bg-dark border ${fieldErrors.confirmPassword ? 'border-red-500' : 'border-white/10'} rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all placeholder:text-zinc-600`}
                             placeholder="••••••••"
                             required
-                            minLength={6}
                         />
+                        {fieldErrors.confirmPassword && <p className="mt-1 text-xs text-red-500">{fieldErrors.confirmPassword}</p>}
                     </div>
 
                     <button

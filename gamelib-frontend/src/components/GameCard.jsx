@@ -27,7 +27,7 @@ export default function GameCard({ game, onDelete }) {
                         alt={game.title}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         onError={(e) => {
-                            e.target.src = 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=600&auto=format&fit=crop';
+                            e.target.src = '/assets/placeholder-game.png';
                         }}
                     />
                 ) : (

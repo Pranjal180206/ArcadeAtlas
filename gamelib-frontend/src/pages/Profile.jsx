@@ -13,12 +13,8 @@ export default function Profile() {
     useEffect(() => {
         const fetchStats = async () => {
             try {
-                const res = await api.get('/games');
-                const games = res.data;
-                setStats({
-                    total: games.length,
-                    completed: games.filter(g => g.status === 'Completed').length
-                });
+                const res = await api.get('/auth/me/stats');
+                setStats(res.data);
             } catch (err) {
                 setError('Failed to load profile statistics.');
             } finally {

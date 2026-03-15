@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ArrowLeft, Loader2, Save } from 'lucide-react';
+import { ArrowLeft, Loader2, Save, Plus, Trash2, Calendar, Clock as ClockIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const PLATFORMS = ['PC', 'PlayStation 5', 'PlayStation 4', 'Xbox Series X/S', 'Xbox One', 'Nintendo Switch', 'Mobile', 'Other'];
@@ -11,7 +11,8 @@ export default function GameForm({ initialData = null, onSubmit, isLoading, butt
         cover_url: initialData?.cover_url || '',
         platform: initialData?.platform || 'PC',
         completion_count: initialData?.completion_count || 0,
-        status: initialData?.status || 'Backlog'
+        status: initialData?.status || 'Backlog',
+        sessions: initialData?.sessions || []
     });
 
     const handleChange = (e) => {
@@ -20,6 +21,32 @@ export default function GameForm({ initialData = null, onSubmit, isLoading, butt
             ...prev,
             [name]: name === 'completion_count' ? parseInt(value) || 0 : value,
         }));
+    };
+
+    const handleSessionChange = (index, field, value) => {
+        const newSessions = [...formData.sessions];
+        newSessions[index] = {
+            ...newSessions[index],
+            [field]: field === 'hours_played' ? parseFloat(value) || 0 : value
+        };
+        setFormData({ ...formData, sessions: newSessions });
+    };
+
+    const addSession = () => {
+        setFormData({
+            ...formData,
+            sessions: [
+                ...formData.sessions,
+                { start_date: new Date().toISOString().split('T')[0], end_date: new Date().toISOString().split('T')[0], hours_played: 0 }
+            ]
+        });
+    };
+
+    const removeSession = (index) => {
+        setFormData({
+            ...formData,
+            sessions: formData.sessions.filter((_, i) => i !== index)
+        });
     };
 
     const handleSubmit = (e) => {
@@ -110,6 +137,75 @@ export default function GameForm({ initialData = null, onSubmit, isLoading, butt
                                 className="w-full bg-dark border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all"
                             />
                         </div>
+                    </div>
+
+                    <div className="pt-6 border-t border-white/5">
+                        <div className="flex items-center justify-between mb-4">
+                            <h3 className="text-lg font-semibold text-white">Play Sessions</h3>
+                            <button
+                                type="button"
+                                onClick={addSession}
+                                className="flex items-center gap-1.5 text-sm text-indigo-400 hover:text-indigo-300 transition-colors"
+                            >
+                                <Plus className="w-4 h-4" />
+                                <span>Add Session</span>
+                            </button>
+                        </div>
+
+                        {formData.sessions.length === 0 ? (
+                            <p className="text-zinc-500 text-sm italic">No sessions logged yet.</p>
+                        ) : (
+                            <div className="space-y-4">
+                                {formData.sessions.map((session, index) => (
+                                    <div key={index} className="bg-dark/50 p-4 rounded-xl border border-white/5 grid grid-cols-1 sm:grid-cols-3 gap-4 relative group">
+                                        <div>
+                                            <label className="block text-xs font-medium text-zinc-500 mb-1 flex items-center gap-1">
+                                                <Calendar className="w-3 h-3" /> Start Date
+                                            </label>
+                                            <input
+                                                type="date"
+                                                value={session.start_date}
+                                                onChange={(e) => handleSessionChange(index, 'start_date', e.target.value)}
+                                                className="w-full bg-dark border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:ring-1 focus:ring-indigo-500 outline-none"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs font-medium text-zinc-500 mb-1 flex items-center gap-1">
+                                                <Calendar className="w-3 h-3" /> End Date
+                                            </label>
+                                            <input
+                                                type="date"
+                                                value={session.end_date}
+                                                onChange={(e) => handleSessionChange(index, 'end_date', e.target.value)}
+                                                className="w-full bg-dark border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:ring-1 focus:ring-indigo-500 outline-none"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs font-medium text-zinc-500 mb-1 flex items-center gap-1">
+                                                <ClockIcon className="w-3 h-3" /> Hours
+                                            </label>
+                                            <div className="flex items-center gap-2">
+                                                <input
+                                                    type="number"
+                                                    step="0.5"
+                                                    min="0"
+                                                    value={session.hours_played}
+                                                    onChange={(e) => handleSessionChange(index, 'hours_played', e.target.value)}
+                                                    className="w-full bg-dark border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:ring-1 focus:ring-indigo-500 outline-none"
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => removeSession(index)}
+                                                    className="p-2 text-zinc-500 hover:text-red-400 transition-colors"
+                                                >
+                                                    <Trash2 className="w-4 h-4" />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
 
                     <div className="pt-4 border-t border-white/5">
